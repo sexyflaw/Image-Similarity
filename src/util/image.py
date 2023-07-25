@@ -13,7 +13,7 @@ def load_image_url(url, required_size = (224,224), image_type = 'array'):
     return img
 
 def load_image_file(file_path, required_size=(224, 224), image_type='array'):
-    print(f'loading.. {file_path}, type: {image_type}')
+    # print(f'loading.. {file_path}, type: {image_type}')
     img = Image.open(file_path)
     img = Image.fromarray(np.array(img))
     if required_size is not None:
