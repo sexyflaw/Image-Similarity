@@ -5,7 +5,7 @@ colorFrom: red
 colorTo: green
 sdk: gradio
 sdk_version: 3.16.0
-app_file: app.py
+app_file: app.py.baik
 pinned: false
 duplicated_from: AnnasBlackHat/Image-Similarity
 ---

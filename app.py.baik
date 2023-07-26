@@ -14,7 +14,6 @@ def check(img_main, dir_path, model_idx):
     result = similarity.check_similarity(img_main, dir_path, models[model_idx])
     return result
 
-
 with gr.Blocks() as demo:
     gr.Markdown('Checking Image Similarity')
     # img_main = gr.Text(label='Main Image', placeholder='https://myimage.jpg')
@@ -30,12 +29,9 @@ with gr.Blocks() as demo:
     gr.Markdown('Choose the model')
     model = gr.Dropdown([m.name for m in models], label='Model', type='index')
 
-    gallery = gr.Gallery(
-        label="Generated images", show_label=False, elem_id="gallery"
-    ).style(grid=[1], height="auto")
 
     submit_btn = gr.Button('Check Similarity')
-    submit_btn.click(fn=check, inputs=[img_main, dir_path, model], outputs=gallery)
+    submit_btn.click(fn=check, inputs=[img_main, dir_path, model], outputs=gr.outputs.Textbox())
 
 demo.launch()
 
