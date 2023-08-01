@@ -59,11 +59,82 @@ def capture_video_frames(video_path, output_dir):
     # 释放视频文件
     cap.release()
 
+def diff_video():
+
+
+    # 读取电影解说视频截取的片段和电影视频
+    cap1 = cv2.VideoCapture('D:\\download\\Video\\1.mp4')
+    cap2 = cv2.VideoCapture('D:\\download\\Video\\tao.mp4')
+
+    # 创建背景减除器
+    fgbg1 = cv2.createBackgroundSubtractorMOG2()
+    fgbg2 = cv2.createBackgroundSubtractorMOG2()
+
+    # 初始化变量
+    frame_count1 = 0
+    frame_count2 = 0
+    last_scene_change1 = 0
+    last_scene_change2 = 0
+    last_thresh1 = None
+    last_thresh2 = None
+    threshold = 100  # 设置阈值
+
+    # 循环读取两个视频帧
+    while True:
+        # 读取下一帧
+        ret1, frame1 = cap1.read()
+        ret2, frame2 = cap2.read()
+
+        # 判断是否读取到帧
+        if not ret1 or not ret2:
+            break
+
+        # 背景减除
+        fgmask1 = fgbg1.apply(frame1)
+        fgmask2 = fgbg2.apply(frame2)
+
+        # 二值化处理
+        thresh1 = cv2.threshold(fgmask1, 127, 255, cv2.THRESH_BINARY)[1]
+        thresh2 = cv2.threshold(fgmask2, 127, 255, cv2.THRESH_BINARY)[1]
+
+        # 计算帧差
+        if last_thresh1 is not None and last_thresh2 is not None:
+            # 调整上一帧和当前帧的大小
+            last_thresh1 = cv2.resize(last_thresh1, (thresh1.shape[1], thresh1.shape[0]))
+            last_thresh2 = cv2.resize(last_thresh2, (thresh2.shape[1], thresh2.shape[0]))
+            diff1 = cv2.absdiff(thresh1, last_thresh1)
+            diff2 = cv2.absdiff(thresh2, last_thresh2)
+
+            # 计算场景变化
+            if diff1.mean() > threshold and frame_count1 > last_scene_change1 + 10:
+                scene_change1 = frame_count1
+                last_scene_change1 = scene_change1
+            if diff2.mean() > threshold and frame_count2 > last_scene_change2 + 10:
+                scene_change2 = frame_count2
+                last_scene_change2 = scene_change2
+
+            # 找到相似片段
+            if last_scene_change1 > 0 and last_scene_change2 > 0:
+                if last_scene_change1 == last_scene_change2:
+                    print('Similar scene found at time', round(last_scene_change1 / 30, 2), 'to',
+                          round(frame_count1 / 30, 2), 'seconds in movie video')
+
+        # 更新变量
+        last_thresh1 = thresh1
+        last_thresh2 = thresh2
+        frame_count1 += 1
+        frame_count2 += 1
+
+    # 释放资源
+    cap1.release()
+    cap2.release()
+
 if __name__ == '__main__':
-    video_path = 'D:\\download\\Video\\1.mp4'
-    output_dir = 'D:\\download\\Video\\%s-captured' % os.path.splitext(os.path.basename(video_path))[0]
+    diff_video()
+    #video_path = 'D:\\download\\Video\\1.mp4'
+    #output_dir = 'D:\\download\\Video\\%s-captured' % os.path.splitext(os.path.basename(video_path))[0]
 
     # 确保输出目录存在
-    os.makedirs(output_dir, exist_ok=True)
+    #os.makedirs(output_dir, exist_ok=True)
 
-    capture_video_frames(video_path, output_dir)
+    #capture_video_frames(video_path, output_dir)
