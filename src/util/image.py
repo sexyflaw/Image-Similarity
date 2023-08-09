@@ -31,3 +31,10 @@ def load_image_file(file_path,  required_size = (224,224), image_type='array'):
     if image_type == 'array':
         img = (np.expand_dims(np.array(img), 0)/255).astype(np.float32)
     return img
+
+def load_frame(frame,  required_size = (224,224), image_type='array'):
+    img = Image.fromarray(np.array(frame))
+    img = img.resize(required_size)
+    if image_type == 'array':
+        img = (np.expand_dims(np.array(img), 0)/255).astype(np.float32)
+    return img
